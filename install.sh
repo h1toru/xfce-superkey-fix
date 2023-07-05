@@ -8,7 +8,7 @@ case $fix in
     1) url='https://github.com/alols/xcape' ;;
     2) url='https://github.com/hanschen/ksuperkey' ;;
     3) url='https://github.com/jixunmoe/xfce-superkey' ;;
-    *) echo "Please input one of the option above!"; exit 1 ;;
+    *) echo "Please input one of the option above!"; exit 1; ;;
 esac
 
 # env variable
@@ -24,11 +24,10 @@ sudo apt install git gcc make libx11-dev libxtst-dev pkg-config -y &>/dev/null
 sudo dnf install git gcc make libX11-devel libXtst-devel pkgconfig &>/dev/null
 
 # fetch and compile the fixer
-cd ~/Downloads
 rm -rf ~/Downloads/$ID 2>/dev/null
-git clone $url &>/dev/null
+git clone -q $url ~/Downloads/$ID && \
 echo "$url Fetched."
-cd $ID
+cd ~/Downloads/$ID
 make &>/dev/null
 
 read -p "Install or Uninstall? [I/U] " iu
@@ -37,7 +36,6 @@ if [ "${iu,,}" == "u" ]; then
     sudo rm -f $(find /usr/bin /usr/local/bin -type 'f' -name "$ID" 2>/dev/null)
     rm -f $asconf 2>/dev/null
     [ -f ${ksconf}.bak ] && mv ${ksconf}.bak $ksconf
-    echo "Uninstalled!"
 else
     sudo make install
     # generate autostart
@@ -54,7 +52,6 @@ Hidden=false
     # remove whisker menu from keyboard shortcut and '(keypad)' from window manager's shortcut
     [ -f ${ksconf}.bak ] || cp $ksconf ${ksconf}.bak
     cat $ksconf | grep -v 'whiskermenu' | sed 's|KP_||g' | tee $ksconf >/dev/null
-    echo "Installed!"
 fi
 
 # cleanup
